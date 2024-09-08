@@ -30,9 +30,13 @@ class User
     #[ORM\ManyToMany(targetEntity: Group::class, mappedBy: 'users')]
     private Collection $groups;
 
+    #[ORM\OneToMany(targetEntity: Expense::class, mappedBy: 'user')]
+    private Collection $expenses;
+
     public function __construct()
     {
         $this->groups = new ArrayCollection();
+        $this->expenses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -74,6 +78,36 @@ class User
     {
         if ($this->groups->removeElement($group)) {
             $group->removeUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getExpenses(): Collection
+    {
+        return $this->expenses;
+    }
+
+    public function addExpense(User $expense): static
+    {
+        if (!$this->expenses->contains($expense)) {
+            $this->expenses->add($expense);
+            $expense->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExpense(User $expense): static
+    {
+        if ($this->expenses->removeElement($expense)) {
+            // set the owning side to null (unless already changed)
+            if ($expense->getUser() === $this) {
+                $expense->setUser(null);
+            }
         }
 
         return $this;
