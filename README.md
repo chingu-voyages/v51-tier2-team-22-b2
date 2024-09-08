@@ -19,6 +19,12 @@ Next starts
 make up
 ```
 
+Create/Reset DB
+
+```
+make reset-db
+```
+
 Down project
 
 ```
