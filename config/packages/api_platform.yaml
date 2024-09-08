@@ -18,3 +18,5 @@ api_platform:
     keep_legacy_inflector: false
     use_symfony_listeners: true
     show_webby: false
+    path_segment_name_generator: api_platform.path_segment_name_generator.dash
+    name_converter: 'Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter'
