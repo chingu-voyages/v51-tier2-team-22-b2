@@ -9,6 +9,7 @@ use App\Repository\GroupRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 #[ORM\Entity(repositoryClass: GroupRepository::class)]
 #[ORM\Table(name: '`group`')]
@@ -16,6 +17,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ApiFilter(SearchFilter::class, properties: ['name' => 'ipartial'])]
 class Group
 {
+    use TimestampableEntity;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
