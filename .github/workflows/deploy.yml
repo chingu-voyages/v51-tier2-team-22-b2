@@ -1,0 +1,49 @@
+name: Deploy branch deploy
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: [ "deploy" ]
+    
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  IMAGES_PREFIX: v51-tier2-team-22-be-
+jobs:
+  # Build job
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      
+      - name: Checkout
+        # https://github.com/actions/checkout
+        uses: actions/checkout@v3
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ vars.AWS_REGION }}
+          # https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services
+          # https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_oidc.html
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: v51-tier2-team-22-be-session
+      
+      - name: Login to Amazon ECR
+        id: login-ecr
+        # https://github.com/aws-actions/amazon-ecr-login
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: 'true'
+      
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+          ECR_REPOSITORY: ${{ vars.AWS_ECR_REPOSITORY }}
+        run: |
+          docker compose -f compose.yaml -f compose.prod.yaml build
+          docker tag ${{ env.IMAGES_PREFIX }}app-php:latest $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker images
