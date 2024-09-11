@@ -46,4 +46,5 @@ jobs:
         run: |
           docker compose -f compose.yaml -f compose.prod.yaml build
           docker tag ${{ env.IMAGES_PREFIX }}app-php:latest $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker images
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
